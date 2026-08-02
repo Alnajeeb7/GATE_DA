@@ -1,0 +1,18 @@
+{
+  "name": "GATE DA Tracker — GATE 2027 Data Science & AI Study Planner",
+  "short_name": "GATE DA Tracker",
+  "description": "A free study tracker for GATE 2027 Data Science & AI (DA) preparation — daily calendar logging, syllabus checklist, notes, and a progress dashboard.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#E7E0CD",
+  "theme_color": "#3D5940",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
