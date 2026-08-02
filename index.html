@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GATE 2027 DA Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #E7E0CD;
+    --paper-2: #F6F1E5;
+    --paper-3: #EFE8D8;
+    --paper-4: #E4DCC6;
+    --ink: #2B2620;
+    --ink-soft: #746B58;
+    --ink-dim: #A69C86;
+    --line: #D7CBAE;
+    --line-hi: #C4B790;
+    --forest: #3D5940;
+    --forest-soft: #dbe6dd;
+    --brass: #9C7A34;
+    --slate: #43586B;
+    --plum: #6E4B63;
+    --rust: #A85A3D;
+    --teal: #2F6259;
+    --shadow: 0 1px 2px rgba(43,38,32,0.06), 0 8px 24px -12px rgba(43,38,32,0.18);
+  }
+  :root[data-theme="dark"]{
+    --paper: #191510;
+    --paper-2: #221D15;
+    --paper-3: #2A2419;
+    --paper-4: #322B1D;
+    --ink: #EDE6D6;
+    --ink-soft: #B7AC93;
+    --ink-dim: #857A63;
+    --line: #38311F;
+    --line-hi: #4C4128;
+    --forest: #74AD80;
+    --forest-soft: #263628;
+    --brass: #D9B466;
+    --slate: #86A0B6;
+    --plum: #C293B0;
+    --rust: #DD8F6C;
+    --teal: #63B8A7;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 26px -12px rgba(0,0,0,0.5);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:transparent; }
+  body{
+    font-family:'Inter',sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse 900px 500px at 10% -10%, rgba(156,122,52,0.10), transparent 60%),
+      var(--paper);
+    min-height:100vh;
+    line-height:1.5;
+    transition: background .2s, color .2s;
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; letter-spacing:-0.01em; color:var(--ink); }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:1180px; margin:0 auto; padding: 26px 22px 70px; }
+
+  /* ---------- NAV ---------- */
+  .tabbar-row{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:22px; border-bottom:1px solid var(--line-hi); flex-wrap:wrap; }
+  .tabbar{ display:flex; gap:6px; flex-wrap:wrap; }
+  .tab{
+    font-family:'Fraunces', serif; font-size:13.5px; font-weight:600;
+    padding:11px 20px 10px; background: var(--paper-3);
+    border:1px solid var(--line-hi); border-bottom:none;
+    border-radius:10px 10px 0 0; color:var(--ink-soft);
+    cursor:pointer; position:relative; top:1px;
+    transition: background .15s, color .15s;
+  }
+  .tab:hover{ color:var(--ink); }
+  .tab.active{ background:var(--paper-2); color:var(--forest); box-shadow: var(--shadow); }
+  .tab .dot{ display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--brass); margin-right:7px; position:relative; top:-1px; }
+  .theme-btn{
+    font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; color:var(--ink-soft);
+    background:var(--paper-3); border:1px solid var(--line-hi); border-bottom:none;
+    padding:10px 16px; border-radius:10px 10px 0 0; cursor:pointer; margin-bottom:0;
+    display:flex; align-items:center; gap:7px; position:relative; top:1px;
+  }
+  .theme-btn:hover{ color:var(--ink); }
+
+  .page{ display:none; }
+  .page.active{ display:block; animation: fade .25s ease; }
+  @keyframes fade{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background: var(--paper-2); border:1px solid var(--line);
+    border-radius:16px; padding: 26px 28px; box-shadow: var(--shadow);
+    margin-bottom:20px; position:relative; overflow:hidden;
+  }
+  .hero::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background: linear-gradient(180deg,var(--forest),var(--brass)); }
+  .eyebrow{ font-size:11px; text-transform:uppercase; letter-spacing:0.14em; color:var(--brass); font-weight:600; margin-bottom:6px; }
+  .hero h1{ font-size:27px; font-weight:600; }
+  .hero .sub{ color:var(--ink-soft); font-size:13px; margin-top:5px; }
+
+  .stat-row{ display:flex; gap:14px; margin-top:22px; flex-wrap:wrap; }
+  .stat{ background:var(--paper-3); border:1px solid var(--line); border-radius:12px; padding:12px 18px; min-width:110px; text-align:center; }
+  .stat .num{ font-family:'Fraunces',serif; font-size:22px; font-weight:600; color:var(--ink); }
+  .stat .lbl{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-dim); margin-top:2px; }
+  .stat.streak .num{ color:var(--rust); }
+  .stat.done .num{ color:var(--forest); }
+
+  .ring-row{ display:flex; align-items:center; gap:26px; margin-top:24px; flex-wrap:wrap; }
+  .ring-label .big{ font-family:'Fraunces',serif; font-size:15px; font-weight:600; }
+  .ring-label .small{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; max-width:440px; }
+  .today-badge{ margin-left:auto; font-size:12px; color:var(--ink-soft); border:1px solid var(--line-hi); padding:7px 13px; border-radius:9px; background:var(--paper-3); }
+  .today-badge b{ color:var(--ink); }
+
+  /* ---------- MINI CARDS (Next up / Quick progress) ---------- */
+  .mini-cards-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .next-up-card, .quick-progress-card{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow);
+  }
+  .mini-card-label{ font-family:'Fraunces',serif; font-size:13.5px; font-weight:600; margin-bottom:12px; }
+  .nu-title{ font-size:14.5px; font-weight:600; color:var(--ink); }
+  .nu-sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+  .nu-badge{ display:inline-block; margin-top:10px; font-size:11px; font-weight:600; padding:4px 11px; border-radius:20px; background:var(--forest-soft); color:var(--forest); }
+  .qp-row{ display:flex; align-items:center; gap:10px; padding:7px 0; cursor:pointer; }
+  .qp-row:hover .qp-name{ color:var(--forest); }
+  .qp-name{ font-size:12px; color:var(--ink-soft); width:118px; flex:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .qp-bar-outer{ flex:1; height:6px; background:var(--paper-3); border:1px solid var(--line); border-radius:20px; overflow:hidden; }
+  .qp-bar-inner{ height:100%; border-radius:20px; }
+  .qp-pct{ font-size:11px; color:var(--ink-dim); width:34px; text-align:right; flex:none; }
+  @media (max-width:720px){ .mini-cards-row{ grid-template-columns:1fr; } }
+
+  /* ---------- SECTION ---------- */
+  .section-head{ display:flex; justify-content:space-between; align-items:baseline; margin:28px 0 14px; }
+  .section-head h2{ font-size:17px; }
+  .section-head .count{ font-size:11.5px; color:var(--ink-dim); }
+
+  /* ---------- GRID / CARDS ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+  .card{ background:var(--paper-2); border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow: var(--shadow); cursor:pointer; transition: transform .15s, border-color .15s; }
+  .card:hover{ transform:translateY(-2px); border-color:var(--line-hi); }
+  .card-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+  .card-title{ font-family:'Fraunces',serif; font-size:15.5px; font-weight:600; display:flex; gap:8px; }
+  .status-chip{ font-size:10px; padding:4px 10px; border-radius:20px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; flex:none; }
+  .status-chip.ongoing{ background:#F3E4CE; color:var(--brass); }
+  .status-chip.upcoming{ background:#E1E7EC; color:var(--slate); }
+  .status-chip.completed{ background:var(--forest-soft); color:var(--forest); }
+  .status-chip.recorded{ background:#EBE1E7; color:var(--plum); }
+  :root[data-theme="dark"] .status-chip.ongoing{ background:#3A2E15; }
+  :root[data-theme="dark"] .status-chip.upcoming{ background:#1D2731; }
+  :root[data-theme="dark"] .status-chip.recorded{ background:#2E212A; }
+  .card-dates{ font-size:11.5px; color:var(--ink-dim); margin-top:8px; display:flex; gap:14px; }
+  .card-dates b{ color:var(--ink-soft); font-weight:500; }
+  .bar-outer{ height:7px; background:var(--paper-3); border:1px solid var(--line); border-radius:20px; margin:14px 0 4px; overflow:hidden; }
+  .bar-inner{ height:100%; border-radius:20px; transition:width .4s ease; }
+  .bar-pct{ font-size:11px; color:var(--ink-dim); text-align:right; }
+  .card-cta{ font-size:11.5px; color:var(--forest); margin-top:10px; font-weight:600; }
+  .syllabus-mini{ font-size:11px; color:var(--ink-dim); margin-top:6px; }
+
+  .rec-toggle{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--ink-soft); margin-top:14px; cursor:pointer; user-select:none; }
+  .rec-toggle input{ display:none; }
+  .box{ width:17px; height:17px; border-radius:5px; border:1.5px solid var(--line-hi); flex:none; display:flex; align-items:center; justify-content:center; background:var(--paper-3); }
+  .rec-toggle input:checked + .box{ background:var(--plum); border-color:var(--plum); }
+  .rec-toggle input:checked + .box::after{ content:"✓"; color:var(--paper-2); font-size:11px; font-weight:700; }
+  .rec-toggle.done{ color:var(--ink-dim); text-decoration:line-through; }
+
+  /* ---------- SUBJECT DETAIL ---------- */
+  .back-link{ font-size:12.5px; color:var(--ink-soft); display:inline-flex; align-items:center; gap:6px; margin-bottom:16px; cursor:pointer; }
+  .back-link:hover{ color:var(--forest); }
+  .detail-head{ background:var(--paper-2); border:1px solid var(--line); border-radius:16px; padding:24px 26px; box-shadow:var(--shadow); }
+  .detail-head h2{ font-size:22px; }
+  .detail-head .meta{ display:flex; gap:20px; margin-top:10px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft); }
+  .detail-head .meta b{ color:var(--ink); }
+
+  .heatmap-card{ background:var(--paper-2); border:1px solid var(--line); border-radius:16px; padding:22px 24px; margin-top:16px; box-shadow:var(--shadow); }
+  .heatmap-flex{ display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap; }
+  .calendar-col{ flex:0 0 auto; overflow-x:auto; }
+  .weekday-row{ display:grid; grid-template-columns:repeat(7,34px); gap:6px; margin-bottom:8px; }
+  .weekday-row div{ text-align:center; font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.04em; }
+  .month-label{ font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.08em; margin:14px 0 6px; }
+  .month-label:first-of-type{ margin-top:0; }
+  .days-grid{ display:grid; grid-template-columns:repeat(7,34px); gap:6px; margin-bottom:4px; }
+  .day-cell{
+    width:34px; height:34px; border-radius:8px; border:1.5px solid var(--line);
+    background:var(--paper-3); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-dim);
+    cursor:pointer; transition: all .12s;
+  }
+  .day-cell:hover{ border-color:var(--line-hi); }
+  .day-cell.checked{ color:var(--paper-2); border-color:transparent; font-weight:600; }
+  .day-cell.today{ box-shadow: 0 0 0 2px var(--brass); }
+  .day-cell.selected{ box-shadow: 0 0 0 2px var(--ink); }
+  .day-cell.today.selected{ box-shadow: 0 0 0 2px var(--brass), 0 0 0 4px var(--ink); }
+  .day-cell.future{ opacity:0.55; }
+  .day-cell.blank{ visibility:hidden; cursor:default; }
+  .day-cell.muted{ opacity:0.28; cursor:default; pointer-events:none; }
+
+  .legend-row{ display:flex; gap:18px; margin-top:16px; font-size:11px; color:var(--ink-dim); flex-wrap:wrap; }
+  .legend-row span{ display:inline-flex; align-items:center; gap:6px; }
+  .sw{ width:12px; height:12px; border-radius:4px; display:inline-block; border:1.5px solid var(--line); }
+
+  /* ---------- DAY REVIEW PANEL ---------- */
+  .day-panel{
+    flex:1 1 300px; min-width:280px; background:var(--paper-3); border:1px solid var(--line);
+    border-radius:12px; padding:18px 20px; align-self:stretch;
+  }
+  .day-panel .empty-hint{ font-size:12.5px; color:var(--ink-dim); padding:20px 4px; text-align:center; }
+  .day-panel-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; flex-wrap:wrap; gap:6px; }
+  .day-panel-head h3{ font-size:14.5px; }
+  .day-panel-head .dp-count{ font-size:11px; color:var(--ink-dim); }
+  .day-panel .hint{ font-size:11.5px; color:var(--ink-dim); margin-bottom:12px; }
+  .topic-pills{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 18px; }
+  .topic-pill{ font-size:12px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--line-hi); color:var(--ink-soft); cursor:pointer; background:var(--paper-2); transition:all .15s; font-family:'Inter',sans-serif; }
+  .topic-pill:hover{ border-color:var(--forest); color:var(--ink); }
+  .topic-pill.active{ background:var(--forest); color:var(--paper-2); border-color:var(--forest); font-weight:600; }
+  .review-card{ background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+  .review-card-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .review-card-head .rc-title{ font-weight:600; color:var(--ink); font-size:13px; }
+  .review-card-remove{ background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:14px; line-height:1; padding:2px 4px; }
+  .review-card-remove:hover{ color:var(--rust); }
+  .rs-overview{ font-size:12px; color:var(--ink-dim); line-height:1.5; margin-top:8px; }
+  .rs-points{ margin:6px 0 0 16px; padding:0; list-style:disc; font-size:11.5px; color:var(--ink-dim); }
+  .rs-points li{ margin:3px 0; line-height:1.45; }
+  .note-block{ margin-top:12px; }
+  .note-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-dim); margin-bottom:4px; }
+  .note-text{ font-size:12px; color:var(--ink-soft); white-space:pre-wrap; line-height:1.5; }
+  .note-edit, .note-add{ background:none; border:none; color:var(--forest); font-size:11.5px; font-weight:600; cursor:pointer; padding:4px 0; margin-top:6px; font-family:'Inter',sans-serif; }
+  .note-edit:hover, .note-add:hover{ text-decoration:underline; }
+  .note-input{ width:100%; min-height:72px; background:var(--paper-3); border:1px solid var(--line); border-radius:8px; padding:9px 11px; font-size:12.5px; color:var(--ink); font-family:'Inter',sans-serif; resize:vertical; }
+  .note-input:focus{ outline:none; border-color:var(--line-hi); }
+  .note-actions{ display:flex; gap:8px; margin-top:8px; }
+  .note-actions button{ font-size:11.5px; font-weight:600; padding:6px 14px; border-radius:7px; border:1px solid var(--line-hi); cursor:pointer; background:var(--paper-2); color:var(--ink-soft); font-family:'Inter',sans-serif; }
+  .note-save{ background:var(--forest); color:var(--paper-2); border-color:var(--forest); }
+  .note-cancel:hover{ color:var(--rust); }
+  .no-topics-msg{ font-size:12px; color:var(--ink-dim); }
+
+  /* ---------- SYLLABUS EDITOR ---------- */
+  .syllabus-card{ background:var(--paper-2); border:1px solid var(--line); border-radius:16px; padding:22px 24px; margin-top:16px; box-shadow:var(--shadow); }
+  .syllabus-card h3{ font-size:14.5px; margin-bottom:3px; }
+  .syllabus-card .hint{ font-size:11.5px; color:var(--ink-dim); margin-bottom:14px; }
+  .topic-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; color:var(--ink-soft); }
+  .topic-row:last-of-type{ border-bottom:none; }
+  .topic-row .tname{ flex:1; }
+  .topic-row .tlogged{ font-size:11px; color:var(--ink-dim); }
+  .topic-remove{ background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:15px; padding:2px 6px; }
+  .topic-remove:hover{ color:var(--rust); }
+  .topic-add{ display:flex; gap:8px; margin-top:14px; }
+  .topic-add input{ flex:1; background:var(--paper-3); border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:12.5px; color:var(--ink); font-family:'Inter',sans-serif; }
+  .topic-add input:focus{ outline:none; border-color:var(--line-hi); }
+  .topic-add button{ background:var(--forest); color:var(--paper-2); border:none; border-radius:8px; padding:9px 16px; font-size:12.5px; font-weight:600; cursor:pointer; }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline-card{ background:var(--paper-2); border:1px solid var(--line); border-radius:16px; padding:24px 26px 20px; overflow-x:auto; box-shadow:var(--shadow); }
+  .tl-months{ display:grid; grid-template-columns:130px repeat(6,1fr); font-size:10.5px; color:var(--ink-dim); margin-bottom:16px; min-width:680px; }
+  .tl-months div{ text-align:left; text-transform:uppercase; letter-spacing:0.07em; }
+  .tl-row{ display:grid; grid-template-columns:130px repeat(6,1fr); align-items:start; min-width:680px; padding:16px 0; cursor:pointer; }
+  .tl-row + .tl-row{ border-top:1px solid var(--line); }
+  .tl-row .name{ font-size:12.5px; color:var(--ink); font-weight:500; padding-top:1px; transition:color .15s; }
+  .tl-row:hover .name{ color:var(--forest); }
+  .tl-track-wrap{ grid-column:2/8; }
+  .tl-track{ position:relative; height:8px; }
+  .tl-bar-outline{ position:absolute; top:0; height:8px; border-radius:20px; overflow:hidden; opacity:0.22; }
+  .tl-bar-fill{ position:absolute; top:0; left:0; height:8px; border-radius:20px; }
+  .tl-today{ position:absolute; top:-4px; bottom:-4px; width:1px; background:var(--rust); opacity:0.55; z-index:5; }
+  .tl-meta{ font-size:11px; color:var(--ink-dim); margin-top:9px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .tl-meta .tl-status{ font-weight:600; }
+  .tl-meta .sep{ opacity:0.5; }
+  .tl-legend{ display:flex; gap:18px; margin-top:20px; font-size:11px; color:var(--ink-dim); flex-wrap:wrap; padding-top:16px; border-top:1px solid var(--line); }
+  .tl-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .dot{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+
+  footer{ text-align:center; color:var(--ink-dim); font-size:11.5px; margin-top:44px; }
+
+  @media (max-width:640px){
+    .hero h1{ font-size:22px; }
+    .tl-months,.tl-row{ min-width:600px; }
+    .tab{ padding:9px 14px 8px; font-size:12.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tabbar-row">
+    <nav class="tabbar" id="tabbar">
+      <div class="tab" data-route="#/overview"><span class="dot"></span>Overview</div>
+      <div class="tab" data-route="#/subjects"><span class="dot"></span>Live Subjects</div>
+      <div class="tab" data-route="#/recorded"><span class="dot"></span>Recorded</div>
+      <div class="tab" data-route="#/timeline"><span class="dot"></span>Timeline</div>
+    </nav>
+    <button class="theme-btn" id="themeToggle">🌙 <span id="themeLabel">Dark mode</span></button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="page" id="page-overview">
+    <div class="hero">
+      <div class="eyebrow">GATE 2027 · DA · Batch D</div>
+      <h1>GATE 2027 — Data Science &amp; AI</h1>
+      <div class="sub">Your batch schedule, tracked day by day</div>
+      <div class="stat-row">
+        <div class="stat streak"><div class="num" id="streakNum">0</div><div class="lbl">Day streak</div></div>
+        <div class="stat"><div class="num" id="bestStreakNum">0</div><div class="lbl">Best streak</div></div>
+        <div class="stat"><div class="num" id="weekNum">0/7</div><div class="lbl">This week</div></div>
+        <div class="stat done"><div class="num" id="doneNum">0/13</div><div class="lbl">Subjects done</div></div>
+        <div class="stat"><div class="num" id="ongoingNum">0</div><div class="lbl">Ongoing now</div></div>
+        <div class="stat"><div class="num" id="daysNum">0/0</div><div class="lbl">Study days logged</div></div>
+        <div class="stat"><div class="num" id="topicsNum">0/0</div><div class="lbl">Topics logged</div></div>
+      </div>
+      <div class="ring-row">
+        <svg width="96" height="96" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="10"/>
+          <circle id="ringProgress" cx="50" cy="50" r="42" fill="none" stroke="var(--forest)" stroke-width="10"
+            stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 50 50)"/>
+          <text id="ringPct" x="50" y="56" text-anchor="middle" font-family="Fraunces" font-size="19" font-weight="700" fill="var(--ink)">0%</text>
+        </svg>
+        <div class="ring-label">
+          <div class="big">Overall days completed</div>
+          <div class="small">Days in your Jul 27 – Dec 31 prep window with at least one topic logged, across any subject.</div>
+        </div>
+        <div class="today-badge">Today · <b id="todayStr"></b></div>
+      </div>
+    </div>
+
+    <div class="mini-cards-row">
+      <div class="next-up-card">
+        <div class="mini-card-label">📍 Next up</div>
+        <div id="nextUpBody"></div>
+      </div>
+      <div class="quick-progress-card">
+        <div class="mini-card-label">📈 Quick progress</div>
+        <div id="quickProgressBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE SUBJECTS -->
+  <section class="page" id="page-subjects">
+    <div class="section-head"><h2>Live &amp; scheduled subjects</h2><div class="count" id="liveCount"></div></div>
+    <div class="grid" id="liveGrid"></div>
+  </section>
+
+  <!-- SUBJECT DETAIL -->
+  <section class="page" id="page-detail">
+    <div class="back-link" id="backLink" data-route="#/subjects">← Back to subjects</div>
+    <div id="detailContent"></div>
+  </section>
+
+  <!-- RECORDED -->
+  <section class="page" id="page-recorded">
+    <div class="section-head"><h2>Recorded subjects</h2><div class="count" id="recCount"></div></div>
+    <div class="grid" id="recGrid"></div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="page" id="page-timeline">
+    <div class="section-head"><h2>Schedule timeline</h2><div class="count">Jul – Dec 2026</div></div>
+    <div class="timeline-card">
+      <div class="tl-months" id="tlMonths"></div>
+      <div id="tlRows"></div>
+      <div class="tl-legend">
+        <span><span class="dot" style="background:#3D5940"></span>Python</span>
+        <span><span class="dot" style="background:#6E4B63"></span>AI / Probability</span>
+        <span><span class="dot" style="background:#43586B"></span>DSA / Warehousing</span>
+        <span><span class="dot" style="background:#9C7A34"></span>DBMS</span>
+        <span><span class="dot" style="background:#2F6259"></span>Algorithms</span>
+        <span><span class="dot" style="background:#A85A3D"></span>Today</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>Tap a date to log what you studied that day — saved automatically and fully reversible. Streak counts consecutive days with at least one tick.</footer>
+</div>
+
+<script>
+const TODAY = new Date();
+const todayKey = TODAY.toISOString().slice(0,10);
+
+const subjects = [
+  { slug:"python", name:"Python For Data Science", icon:"🐍", start:"2026-07-27", end:"2026-08-28", color:"#3D5940" },
+  { slug:"ai", name:"Artificial Intelligence", icon:"🤖", start:"2026-08-31", end:"2026-10-23", color:"#6E4B63" },
+  { slug:"dsa", name:"Data Structure Through Python", icon:"🧩", start:"2026-08-31", end:"2026-10-02", color:"#43586B" },
+  { slug:"dbms", name:"DBMS", icon:"🗄️", start:"2026-08-31", end:"2026-10-09", color:"#9C7A34" },
+  { slug:"prob", name:"Probability & Statistics", icon:"📊", start:"2026-10-26", end:"2026-12-31", color:"#6E4B63" },
+  { slug:"algo", name:"Algorithms", icon:"⚙️", start:"2026-11-09", end:"2026-12-25", color:"#2F6259" },
+  { slug:"dwh", name:"Data Warehousing", icon:"🏬", start:"2026-10-07", end:"2026-10-16", color:"#43586B" },
+];
+
+// Recorded subjects are self-paced, but get the same daily-log window as the rest of
+// the batch (its earliest start to its latest end) so they can share the exact same
+// calendar + syllabus + notes system as live subjects.
+const BATCH_WINDOW_START = "2026-07-27";
+const BATCH_WINDOW_END = "2026-12-31";
+const recorded = [
+  { slug:"verbal", name:"Verbal Aptitude", icon:"🗣️", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#6E4B63", recorded:true },
+  { slug:"calc", name:"Calculus & Optimization", icon:"∫", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#43586B", recorded:true },
+  { slug:"genapt", name:"General Aptitude", icon:"🧠", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#9C7A34", recorded:true },
+  { slug:"linalg", name:"Linear Algebra", icon:"➗", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#2F6259", recorded:true },
+  { slug:"ml", name:"Machine Learning", icon:"🎯", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#3D5940", recorded:true },
+  { slug:"fem", name:"Foundation of Engineering Maths", icon:"📐", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#6E4B63", recorded:true },
+];
+const allSubjects = [...subjects, ...recorded];
+
+// Generic suggested syllabus per subject — editable starting point, not official batch content
+const defaultTopics = {
+  python: ["Python basics & syntax","Data structures (list, dict, tuple, set)","NumPy","Pandas","Data visualization","OOP in Python"],
+  ai: ["Intelligent agents","Uninformed search (BFS/DFS)","Informed search (A*, heuristics)","Adversarial search (Minimax)","Constraint satisfaction","Bayesian networks","Neural networks basics"],
+  dsa: ["Arrays & strings","Linked lists","Stacks & queues","Trees & BST","Graphs","Sorting & searching","Hashing"],
+  dbms: ["ER model","Relational algebra","Normalization","SQL queries","Transactions & concurrency","Indexing"],
+  prob: ["Probability basics","Random variables","Distributions","Expectation & variance","Hypothesis testing","Regression basics"],
+  algo: ["Asymptotic analysis","Divide & conquer","Greedy algorithms","Dynamic programming","Graph algorithms","NP-completeness"],
+  dwh: ["OLAP vs OLTP","Star & snowflake schema","ETL basics","Data cubes","Dimensional modeling"],
+  verbal: ["Reading comprehension","Vocabulary & synonyms/antonyms","Sentence correction","Verbal analogies","Critical reasoning"],
+  calc: ["Limits & continuity","Differentiation","Applications of derivatives (optimization)","Integration basics","Maxima & minima"],
+  genapt: ["Numerical ability","Quantitative reasoning","Data interpretation","Logical reasoning","Puzzles & seating arrangements"],
+  linalg: ["Matrices & determinants","Systems of linear equations","Eigenvalues & eigenvectors","Vector spaces","Rank of a matrix"],
+  ml: ["Supervised vs unsupervised learning","Linear & logistic regression","Decision trees","Overfitting & regularization","Model evaluation metrics"],
+  fem: ["Calculus refresher","Linear algebra refresher","Probability refresher","Set theory & functions","Basic mathematical logic"],
+};
+
+// Predefined study notes shown when a topic is checked off for a given day.
+// Each has a one-line overview plus specific, concrete points — not just a generic blurb.
+const topicSummaries = {
+  python: {
+    "Python basics & syntax": { overview:"The foundation everything else builds on — how a Python script is actually read and executed.", points:[
+      "Variables, dynamic typing, and basic operators",
+      "Control flow: if/elif/else, for and while loops",
+      "Defining functions, default arguments, and return values"] },
+    "Data structures (list, dict, tuple, set)": { overview:"Python's built-in containers, and picking the right one for the job.", points:[
+      "Lists: ordered, mutable — indexing and slicing",
+      "Dictionaries: key-value lookup and common methods",
+      "Tuples (immutable) vs sets (unique, unordered) and when each fits"] },
+    "NumPy": { overview:"The array library nearly every other data-science tool is built on top of.", points:[
+      "Creating and reshaping ndarrays",
+      "Vectorized operations instead of Python loops",
+      "Broadcasting rules and basic linear algebra (dot, matmul)"] },
+    "Pandas": { overview:"Working with tabular data the way you would in a spreadsheet, but programmatically.", points:[
+      "Series vs DataFrame, and reading CSV/Excel data",
+      "Filtering, selecting, and transforming columns",
+      "GroupBy aggregation and merging/joining tables"] },
+    "Data visualization": { overview:"Turning a DataFrame into a chart that actually communicates something.", points:[
+      "Line and bar charts for trends and comparisons",
+      "Scatter plots and histograms for distributions",
+      "Labeling, titles, and choosing the right chart type"] },
+    "OOP in Python": { overview:"Structuring code around objects instead of just functions and scripts.", points:[
+      "Defining classes, __init__, and instance attributes",
+      "Inheritance and method overriding",
+      "Encapsulation and when OOP actually helps vs adds overhead"] },
+  },
+  ai: {
+    "Intelligent agents": { overview:"The mental model AI courses build everything else on top of.", points:[
+      "Agent = perceive environment, decide, act",
+      "Rational vs optimal behavior under uncertainty",
+      "Types: simple reflex, model-based, goal-based, utility-based agents"] },
+    "Uninformed search (BFS/DFS)": { overview:"Search without any domain knowledge — just the graph structure.", points:[
+      "BFS: level-by-level, guarantees shortest path (unweighted)",
+      "DFS: goes deep first, low memory, no shortest-path guarantee",
+      "Completeness and time/space complexity trade-offs"] },
+    "Informed search (A*, heuristics)": { overview:"Using an estimate of remaining cost to search smarter, not just harder.", points:[
+      "Heuristic function h(n) and admissibility",
+      "A* = actual cost so far + heuristic estimate (f = g + h)",
+      "Why a good heuristic dramatically cuts down the search space"] },
+    "Adversarial search (Minimax)": { overview:"Search when an opponent is actively working against you.", points:[
+      "Minimax: alternating max/min layers in a game tree",
+      "Alpha-beta pruning to skip branches that can't affect the result",
+      "Depth-limited search with an evaluation function"] },
+    "Constraint satisfaction": { overview:"Framing a problem as variables that must satisfy a set of constraints.", points:[
+      "Variables, domains, and constraints (e.g. Sudoku, map coloring)",
+      "Backtracking search with constraint propagation",
+      "Heuristics like MRV (minimum remaining values) to speed things up"] },
+    "Bayesian networks": { overview:"A compact way to represent how uncertain variables depend on each other.", points:[
+      "Directed acyclic graph of conditional dependencies",
+      "Conditional probability tables at each node",
+      "Using the network for inference given partial evidence"] },
+    "Neural networks basics": { overview:"The building block underneath every modern deep learning model.", points:[
+      "Perceptron: weighted sum plus activation function",
+      "Common activations (sigmoid, ReLU) and why they matter",
+      "Forward propagation through a simple multi-layer network"] },
+  },
+  dsa: {
+    "Arrays & strings": { overview:"The simplest data structures — and the ones most problem sets warm up with.", points:[
+      "Indexing, traversal, and in-place manipulation",
+      "Two-pointer and sliding-window techniques",
+      "Common string operations: reversal, substring search, comparisons"] },
+    "Linked lists": { overview:"Nodes connected by pointers instead of contiguous memory.", points:[
+      "Singly vs doubly linked lists",
+      "Insertion/deletion at head, tail, and middle",
+      "Detecting cycles (Floyd's slow/fast pointer)"] },
+    "Stacks & queues": { overview:"Restricted-access structures that show up everywhere from parsing to scheduling.", points:[
+      "Stack: LIFO — push/pop, used in expression evaluation and recursion",
+      "Queue: FIFO — enqueue/dequeue, used in BFS and task scheduling",
+      "Circular queues and deque variations"] },
+    "Trees & BST": { overview:"Hierarchical structures, with BSTs adding fast ordered lookup.", points:[
+      "Tree terminology: root, leaf, height, depth",
+      "In-order, pre-order, post-order traversal",
+      "BST insertion/search/deletion and why balance matters"] },
+    "Graphs": { overview:"Modeling relationships between things — not just a line of data.", points:[
+      "Adjacency list vs adjacency matrix representation",
+      "BFS/DFS traversal on graphs (not just trees)",
+      "Directed vs undirected, weighted vs unweighted graphs"] },
+    "Sorting & searching": { overview:"The algorithms whose complexity trade-offs come up constantly.", points:[
+      "Comparison sorts: merge sort, quicksort, heapsort",
+      "Time/space complexity and stability differences",
+      "Binary search and its preconditions (sorted input)"] },
+    "Hashing": { overview:"Trading a bit of memory for near-constant-time lookups.", points:[
+      "Hash functions and how collisions happen",
+      "Collision handling: chaining vs open addressing",
+      "Average-case O(1) vs worst-case behavior"] },
+  },
+  dbms: {
+    "ER model": { overview:"Turning a real-world domain into entities, attributes, and relationships before writing any SQL.", points:[
+      "Entities, attributes, and primary keys",
+      "Relationship types: one-to-one, one-to-many, many-to-many",
+      "Translating an ER diagram into relational tables"] },
+    "Relational algebra": { overview:"The formal operations that SQL is compiling down to under the hood.", points:[
+      "Select (σ) and project (π)",
+      "Join variants (natural join, theta join)",
+      "Union, intersection, and set difference on relations"] },
+    "Normalization": { overview:"Removing redundancy so updates don't create inconsistent data.", points:[
+      "1NF: atomic values, no repeating groups",
+      "2NF/3NF: removing partial and transitive dependencies",
+      "BCNF and when to deliberately denormalize anyway"] },
+    "SQL queries": { overview:"The practical skill — actually getting data out of a database correctly.", points:[
+      "SELECT, WHERE, and filtering logic",
+      "JOINs (inner, left, right) across multiple tables",
+      "GROUP BY, HAVING, and subqueries"] },
+    "Transactions & concurrency": { overview:"Keeping the database correct when multiple operations happen at once.", points:[
+      "ACID: atomicity, consistency, isolation, durability",
+      "Isolation levels and the anomalies they prevent (dirty reads, etc.)",
+      "Locking vs optimistic concurrency control"] },
+    "Indexing": { overview:"Why some queries are instant and others crawl — indexes are usually the answer.", points:[
+      "B-tree indexes for range queries",
+      "Hash indexes for exact-match lookups",
+      "Trade-off: faster reads vs slower writes and extra storage"] },
+  },
+  prob: {
+    "Probability basics": { overview:"The vocabulary every later topic in this subject depends on.", points:[
+      "Sample space, events, and axioms of probability",
+      "Conditional probability and independence",
+      "Bayes' theorem and updating beliefs with evidence"] },
+    "Random variables": { overview:"Turning random outcomes into numbers you can actually compute with.", points:[
+      "Discrete vs continuous random variables",
+      "Probability mass function vs probability density function",
+      "Cumulative distribution function (CDF)"] },
+    "Distributions": { overview:"The handful of shapes that most real-world randomness follows.", points:[
+      "Binomial and Poisson for discrete counts",
+      "Normal (Gaussian) distribution and the central limit theorem",
+      "Recognizing which distribution fits a given scenario"] },
+    "Expectation & variance": { overview:"Summarizing a whole distribution with just two numbers.", points:[
+      "Expected value as a weighted average of outcomes",
+      "Variance and standard deviation as spread measures",
+      "Linearity of expectation (a very testable shortcut)"] },
+    "Hypothesis testing": { overview:"Deciding whether an observed effect is real or just noise.", points:[
+      "Null vs alternative hypothesis",
+      "p-values and significance level (commonly 0.05)",
+      "Type I vs Type II errors"] },
+    "Regression basics": { overview:"Fitting a line to data to predict one variable from another.", points:[
+      "Simple linear regression: y = mx + c",
+      "Least-squares fitting and residuals",
+      "Interpreting slope, intercept, and R²"] },
+  },
+  algo: {
+    "Asymptotic analysis": { overview:"The language used to compare algorithms independent of hardware.", points:[
+      "Big-O (upper bound), Omega (lower bound), Theta (tight bound)",
+      "Best, average, and worst-case analysis",
+      "Common complexity classes: O(1), O(log n), O(n), O(n log n), O(n²)"] },
+    "Divide & conquer": { overview:"Breaking a big problem into smaller versions of the same problem.", points:[
+      "Merge sort and quicksort as canonical examples",
+      "Recurrence relations and the Master theorem",
+      "Combining subproblem results back into the final answer"] },
+    "Greedy algorithms": { overview:"Making the locally best choice at each step and hoping it's globally optimal.", points:[
+      "When greedy actually gives an optimal solution",
+      "Classic examples: activity selection, Huffman coding",
+      "Why greedy fails on problems like 0/1 knapsack"] },
+    "Dynamic programming": { overview:"Solving overlapping subproblems once and reusing the answer.", points:[
+      "Memoization (top-down) vs tabulation (bottom-up)",
+      "Identifying optimal substructure in a problem",
+      "Classic problems: knapsack, LCS, edit distance"] },
+    "Graph algorithms": { overview:"Beyond traversal — finding shortest paths and minimum-cost connections.", points:[
+      "Dijkstra's algorithm for shortest paths",
+      "Minimum spanning tree via Prim's or Kruskal's",
+      "Topological sort for dependency ordering"] },
+    "NP-completeness": { overview:"Recognizing problems where no efficient algorithm is currently known.", points:[
+      "P vs NP and what 'efficiently verifiable' means",
+      "Reductions: showing one hard problem implies another is hard",
+      "Why NP-complete problems are usually tackled with heuristics"] },
+  },
+  dwh: {
+    "OLAP vs OLTP": { overview:"Two very different jobs a database can do, needing different designs.", points:[
+      "OLTP: fast, frequent, small transactions (e.g. a banking app)",
+      "OLAP: complex analytical queries over large historical data",
+      "Why you rarely run heavy analytics directly on a production OLTP database"] },
+    "Star & snowflake schema": { overview:"How a warehouse organizes data for fast aggregation instead of transactional integrity.", points:[
+      "Fact table: the measurable events (sales, clicks, etc.)",
+      "Dimension tables: the context around each fact (time, product, region)",
+      "Star (denormalized dimensions) vs snowflake (normalized dimensions)"] },
+    "ETL basics": { overview:"The pipeline that gets messy source data into a clean warehouse.", points:[
+      "Extract: pulling data from source systems",
+      "Transform: cleaning, joining, and reshaping it",
+      "Load: writing the result into the warehouse on a schedule"] },
+    "Data cubes": { overview:"Pre-aggregated data organized so you can slice it from any angle.", points:[
+      "Dimensions and measures forming a multidimensional cube",
+      "Slice, dice, drill-down, and roll-up operations",
+      "Why cubes make interactive dashboards fast"] },
+    "Dimensional modeling": { overview:"The design discipline behind good star schemas.", points:[
+      "Identifying the grain (level of detail) of a fact table",
+      "Choosing dimensions and measures for a business process",
+      "Slowly changing dimensions (handling data that changes over time)"] },
+  },
+  verbal: {
+    "Reading comprehension": { overview:"The single highest-weightage skill in verbal sections — extracting meaning quickly and accurately.", points:[
+      "Skimming for structure vs reading for detail",
+      "Identifying the author's tone and main idea",
+      "Answering inference vs fact-based questions differently"] },
+    "Vocabulary & synonyms/antonyms": { overview:"Word knowledge that speeds up every other verbal question.", points:[
+      "Building vocabulary through root words and prefixes",
+      "Synonym vs antonym traps (near-meaning distractors)",
+      "Using context clues when a word is unfamiliar"] },
+    "Sentence correction": { overview:"Spotting what's grammatically or stylistically wrong in a sentence.", points:[
+      "Subject-verb agreement and tense consistency",
+      "Parallelism and modifier placement",
+      "Concise vs wordy phrasing"] },
+    "Verbal analogies": { overview:"Recognizing the relationship between a pair of words and matching it.", points:[
+      "Common relationship types: part-whole, cause-effect, degree",
+      "Eliminating options with a different relationship type",
+      "Working from the clearest, most specific pair first"] },
+    "Critical reasoning": { overview:"Evaluating arguments — not just reading them.", points:[
+      "Identifying assumptions, premises, and conclusions",
+      "Strengthen vs weaken vs assumption question types",
+      "Spotting logical fallacies"] },
+  },
+  calc: {
+    "Limits & continuity": { overview:"The foundation calculus is built on — what a function approaches, not just its value.", points:[
+      "Evaluating limits algebraically and graphically",
+      "L'Hôpital's rule for indeterminate forms",
+      "Continuity and points of discontinuity"] },
+    "Differentiation": { overview:"Measuring how a function changes — the core tool of calculus.", points:[
+      "Standard derivative rules (product, quotient, chain rule)",
+      "Derivatives of common functions (poly, trig, exp, log)",
+      "Geometric meaning: slope of the tangent line"] },
+    "Applications of derivatives (optimization)": { overview:"Using derivatives to solve real optimization problems.", points:[
+      "Finding maxima/minima using first and second derivative tests",
+      "Increasing/decreasing intervals",
+      "Word problems: optimizing area, cost, or time"] },
+    "Integration basics": { overview:"The reverse of differentiation — accumulating change.", points:[
+      "Standard integration rules and common forms",
+      "Definite vs indefinite integrals",
+      "Basic substitution technique"] },
+    "Maxima & minima": { overview:"Finding the best (or worst) value a function can take.", points:[
+      "Critical points and the first derivative test",
+      "Second derivative test for concavity",
+      "Global vs local extrema"] },
+  },
+  genapt: {
+    "Numerical ability": { overview:"Fast, accurate arithmetic under time pressure.", points:[
+      "Percentages, ratios, and averages",
+      "Profit & loss, simple/compound interest",
+      "Speed calculation techniques"] },
+    "Quantitative reasoning": { overview:"Applying math logically rather than just computing.", points:[
+      "Number series and pattern recognition",
+      "Time, speed, and distance problems",
+      "Work and time problems"] },
+    "Data interpretation": { overview:"Reading charts, tables, and graphs quickly and correctly.", points:[
+      "Bar/line/pie chart interpretation",
+      "Cross-referencing multiple data sources",
+      "Estimating instead of over-calculating"] },
+    "Logical reasoning": { overview:"Structured thinking — the kind that shows up in puzzle-heavy sections.", points:[
+      "Syllogisms and logical deduction",
+      "Blood relations and coding-decoding",
+      "Statement-conclusion type questions"] },
+    "Puzzles & seating arrangements": { overview:"Multi-constraint problems that reward a systematic approach.", points:[
+      "Linear and circular seating arrangements",
+      "Using elimination grids for constraints",
+      "Reading all clues before starting to solve"] },
+  },
+  linalg: {
+    "Matrices & determinants": { overview:"The basic objects and operations linear algebra is built from.", points:[
+      "Matrix addition, multiplication, and transpose",
+      "Determinant calculation and its geometric meaning",
+      "Inverse of a matrix and when it exists"] },
+    "Systems of linear equations": { overview:"Solving multiple equations at once — a core GATE topic.", points:[
+      "Gaussian elimination",
+      "Consistent vs inconsistent systems",
+      "Unique, infinite, or no solutions"] },
+    "Eigenvalues & eigenvectors": { overview:"Directions a matrix stretches without rotating — heavily tested in GATE.", points:[
+      "Characteristic equation and finding eigenvalues",
+      "Finding eigenvectors for each eigenvalue",
+      "Diagonalization and its uses"] },
+    "Vector spaces": { overview:"The abstract structure underlying most of linear algebra.", points:[
+      "Basis and dimension of a vector space",
+      "Linear independence and span",
+      "Subspaces and their properties"] },
+    "Rank of a matrix": { overview:"A single number that says a lot about a matrix's structure.", points:[
+      "Row rank vs column rank (always equal)",
+      "Rank via row echelon form",
+      "Rank's relationship to solution existence/uniqueness"] },
+  },
+  ml: {
+    "Supervised vs unsupervised learning": { overview:"The fundamental split in how ML problems are framed.", points:[
+      "Supervised: learning from labeled data (classification/regression)",
+      "Unsupervised: finding structure without labels (clustering)",
+      "When you'd choose one over the other"] },
+    "Linear & logistic regression": { overview:"The two workhorse models everything else builds intuition from.", points:[
+      "Linear regression for continuous outputs",
+      "Logistic regression for classification via the sigmoid function",
+      "Cost functions and gradient descent"] },
+    "Decision trees": { overview:"A model that mimics a series of if-else decisions.", points:[
+      "Splitting criteria: Gini impurity, entropy/information gain",
+      "Overfitting a tree and how pruning helps",
+      "Why trees are easy to interpret"] },
+    "Overfitting & regularization": { overview:"The central trade-off in every ML model: fitting training data vs generalizing.", points:[
+      "Recognizing overfitting vs underfitting",
+      "L1 (Lasso) vs L2 (Ridge) regularization",
+      "Train/validation/test split and why it matters"] },
+    "Model evaluation metrics": { overview:"Knowing whether a model is actually good, not just accurate-looking.", points:[
+      "Accuracy, precision, recall, and F1-score",
+      "Confusion matrix interpretation",
+      "When accuracy alone is misleading (imbalanced data)"] },
+  },
+  fem: {
+    "Calculus refresher": { overview:"A quick pass over the calculus fundamentals everything else assumes.", points:[
+      "Limits, derivatives, and integrals — the essentials",
+      "Basic differential equations",
+      "Partial derivatives (brief intro)"] },
+    "Linear algebra refresher": { overview:"The matrix and vector basics needed before the full linear algebra module.", points:[
+      "Matrix operations and notation",
+      "Solving small systems of equations",
+      "Vectors and basic vector operations"] },
+    "Probability refresher": { overview:"Groundwork before the dedicated probability & statistics subject.", points:[
+      "Basic probability rules and counting",
+      "Mean, median, and mode",
+      "Simple combinatorics (permutations & combinations)"] },
+    "Set theory & functions": { overview:"The language used to precisely define everything else in math.", points:[
+      "Set operations: union, intersection, complement",
+      "Types of functions: injective, surjective, bijective",
+      "Relations and their properties"] },
+    "Basic mathematical logic": { overview:"The rules of valid reasoning used throughout GATE's technical sections.", points:[
+      "Propositional logic and truth tables",
+      "Logical connectives (AND, OR, NOT, implies)",
+      "Basic proof techniques (direct, contradiction)"] },
+  },
+};
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function parse(s){ return new Date(s+"T00:00:00"); }
+function fmt(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function fmtLong(d){ return d.toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric', year:'numeric'}); }
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function status(sub){
+  if(sub.recorded) return "recorded";
+  const s=parse(sub.start), e=parse(sub.end);
+  if(TODAY < s) return "upcoming";
+  if(TODAY > e) return "completed";
+  return "ongoing";
+}
+function dateRange(startStr,endStr){
+  const out=[]; let d=parse(startStr); const end=parse(endStr);
+  while(d<=end){ out.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+1); }
+  return out;
+}
+function monthsInRange(startStr,endStr){
+  const s=parse(startStr), e=parse(endStr);
+  const out=[]; let y=s.getFullYear(), m=s.getMonth();
+  while(y<e.getFullYear() || (y===e.getFullYear() && m<=e.getMonth())){
+    out.push({year:y, month:m});
+    m++; if(m>11){ m=0; y++; }
+  }
+  return out;
+}
+document.getElementById('todayStr').textContent = fmt(TODAY);
+
+/* ---------------- STORAGE SHIM ----------------
+   window.storage only exists while this file is previewed inside Claude.
+   Opened directly (e.g. from Downloads) it's undefined, so everything
+   silently failed to save. This shim falls back to the browser's own
+   localStorage in that case, so the tracker works either way. */
+const hasClaudeStorage = () => (typeof window.storage !== 'undefined' && typeof window.storage.get === 'function');
+async function storeGet(key){
+  if(hasClaudeStorage()){
+    try{
+      const r = await window.storage.get(key, false);
+      return r ? r.value : null;
+    }catch(e){ /* fall through to localStorage */ }
+  }
+  try{ return localStorage.getItem('gate27:'+key); }catch(e){ return null; }
+}
+function storeSet(key, value){
+  if(hasClaudeStorage()){
+    return window.storage.set(key, value, false).catch(()=>{
+      try{ localStorage.setItem('gate27:'+key, value); }catch(e){}
+    });
+  }
+  try{ localStorage.setItem('gate27:'+key, value); }catch(e){}
+  return Promise.resolve();
+}
+
+let topicStore = {};   // slug -> [topicText, ...]
+let dailyLog = {};      // slug -> { dateStr: { topicText: true } }
+let notesStore = {};    // slug -> { topicText: "user's own notes" }
+let editingNote = { slug:null, topic:null }; // in-memory only — which note textarea is open
+let selectedDate = {};  // slug -> dateStr (in-memory only)
+let streak = 0;
+let bestStreak = 0;
+
+/* ---------------- LOAD ---------------- */
+async function loadAll(){
+  for(const s of allSubjects){
+    try{
+      const raw = await storeGet('topics:'+s.slug);
+      topicStore[s.slug] = raw ? JSON.parse(raw) : (defaultTopics[s.slug]||[]).slice();
+    }catch(e){ topicStore[s.slug] = (defaultTopics[s.slug]||[]).slice(); }
+    try{
+      const raw = await storeGet('daylog:'+s.slug);
+      dailyLog[s.slug] = raw ? JSON.parse(raw) : {};
+    }catch(e){ dailyLog[s.slug] = {}; }
+    try{
+      const raw = await storeGet('notes:'+s.slug);
+      notesStore[s.slug] = raw ? JSON.parse(raw) : {};
+    }catch(e){ notesStore[s.slug] = {}; }
+  }
+  try{
+    const raw = await storeGet('streak');
+    const rec = raw ? JSON.parse(raw) : {count:0,best:0};
+    streak = rec.count || 0;
+    bestStreak = rec.best || 0;
+  }catch(e){ streak = 0; bestStreak = 0; }
+  try{
+    const raw = await storeGet('theme');
+    applyTheme(raw ? JSON.parse(raw).mode : 'light');
+  }catch(e){ applyTheme('light'); }
+
+  renderAll();
+  router();
+}
+
+/* ---------------- PERSIST HELPERS (fire-and-forget, never block UI) ---------------- */
+function persistTopics(slug){ storeSet('topics:'+slug, JSON.stringify(topicStore[slug])); }
+function persistDayLog(slug){ storeSet('daylog:'+slug, JSON.stringify(dailyLog[slug])); }
+function persistNotes(slug){ storeSet('notes:'+slug, JSON.stringify(notesStore[slug])); }
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+async function bumpStreak(){
+  let rec;
+  try{
+    const raw = await storeGet('streak');
+    rec = raw ? JSON.parse(raw) : {count:0,lastDate:null,best:0};
+  }catch(e){ rec = {count:0,lastDate:null,best:0}; }
+  if(rec.lastDate === todayKey) return;
+  const yesterday = new Date(TODAY); yesterday.setDate(yesterday.getDate()-1);
+  const yKey = yesterday.toISOString().slice(0,10);
+  rec.count = (rec.lastDate === yKey) ? rec.count + 1 : 1;
+  rec.lastDate = todayKey;
+  rec.best = Math.max(rec.best||0, rec.count);
+  streak = rec.count;
+  bestStreak = rec.best;
+  storeSet('streak', JSON.stringify(rec));
+  renderStats();
+}
+
+/* ---------------- ACTIONS ---------------- */
+function selectDate(slug, dateStr){
+  selectedDate[slug] = (selectedDate[slug] === dateStr) ? selectedDate[slug] : dateStr;
+  selectedDate[slug] = dateStr;
+  renderDetail(slug);
+}
+function toggleDayTopic(slug, dateStr, topicText){
+  if(!dailyLog[slug][dateStr]) dailyLog[slug][dateStr] = {};
+  dailyLog[slug][dateStr][topicText] = !dailyLog[slug][dateStr][topicText];
+  persistDayLog(slug);
+  renderAll();
+  renderDetail(slug);
+  bumpStreak();
+}
+function startEditNote(slug, topic){
+  editingNote = { slug, topic };
+  renderDetail(slug);
+}
+function cancelEditNote(slug){
+  editingNote = { slug:null, topic:null };
+  renderDetail(slug);
+}
+function saveNote(slug, topic, text){
+  notesStore[slug][topic] = text;
+  editingNote = { slug:null, topic:null };
+  persistNotes(slug);
+  renderDetail(slug);
+}
+function addTopic(slug, text){
+  if(!text.trim()) return;
+  topicStore[slug].push(text.trim());
+  renderDetail(slug);
+  renderAll();
+  persistTopics(slug);
+}
+function removeTopic(slug, idx){
+  const removed = topicStore[slug][idx];
+  topicStore[slug].splice(idx,1);
+  // also strip that topic out of any logged days so counts stay honest
+  Object.keys(dailyLog[slug]).forEach(d=>{ delete dailyLog[slug][d][removed]; });
+  renderDetail(slug);
+  renderAll();
+  persistTopics(slug);
+  persistDayLog(slug);
+}
+
+function isDayStudied(slug, dateStr){
+  const rec = dailyLog[slug] && dailyLog[slug][dateStr];
+  return rec ? Object.values(rec).some(Boolean) : false;
+}
+function subjectPct(sub){
+  const days = dateRange(sub.start, sub.end);
+  const checked = days.filter(d => isDayStudied(sub.slug, d)).length;
+  return { checked, total: days.length, pct: Math.round(checked/days.length*100) };
+}
+function topicsLoggedCount(slug){
+  const topics = topicStore[slug] || [];
+  const log = dailyLog[slug] || {};
+  const loggedSet = new Set();
+  Object.values(log).forEach(dayObj=>{
+    Object.keys(dayObj).forEach(t=>{ if(dayObj[t]) loggedSet.add(t); });
+  });
+  return { logged: topics.filter(t=>loggedSet.has(t)).length, total: topics.length };
+}
+
+/* ---------------- THEME ---------------- */
+function applyTheme(mode){
+  document.documentElement.setAttribute('data-theme', mode);
+  document.getElementById('themeToggle').firstChild.textContent = mode==='dark' ? '☀️ ' : '🌙 ';
+  document.getElementById('themeLabel').textContent = mode==='dark' ? 'Light mode' : 'Dark mode';
+}
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  storeSet('theme', JSON.stringify({mode:next}));
+});
+
+/* ---------------- RENDER: CARDS ---------------- */
+const STATUS_CHIPS = {ongoing:'Ongoing', upcoming:'Upcoming', completed:'Completed', recorded:'Recorded'};
+
+function buildSubjectCard(sub){
+  const st = status(sub);
+  const { pct } = subjectPct(sub);
+  const { logged, total } = topicsLoggedCount(sub.slug);
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.addEventListener('click', ()=> location.hash = (sub.recorded ? '#/recorded/' : '#/subjects/') + sub.slug);
+  const dateLine = sub.recorded
+    ? `<div class="card-dates">Self-paced · study anytime</div>`
+    : `<div class="card-dates"><span><b>Start</b> ${fmt(parse(sub.start))}</span><span><b>End</b> ${fmt(parse(sub.end))}</span></div>`;
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">${sub.icon} ${sub.name}</div>
+      <div class="status-chip ${st}">${STATUS_CHIPS[st]}</div>
+    </div>
+    ${dateLine}
+    <div class="bar-outer"><div class="bar-inner" style="width:${pct}%; background:${sub.color};"></div></div>
+    <div class="bar-pct">${pct}% of days logged</div>
+    <div class="syllabus-mini">📘 Topics logged: ${logged}/${total}</div>
+    <div class="card-cta">View daily checklist →</div>
+  `;
+  return div;
+}
+
+function renderLiveGrid(){
+  const grid = document.getElementById('liveGrid');
+  grid.innerHTML = '';
+  subjects.forEach(sub=> grid.appendChild(buildSubjectCard(sub)));
+  document.getElementById('liveCount').textContent = subjects.length + ' subjects';
+}
+
+function renderRecGrid(){
+  const grid = document.getElementById('recGrid');
+  grid.innerHTML = '';
+  recorded.forEach(sub=> grid.appendChild(buildSubjectCard(sub)));
+  document.getElementById('recCount').textContent = recorded.length + ' subjects';
+}
+
+/* ---------------- RENDER: DETAIL (calendar + day review panel + syllabus editor) ---------------- */
+function renderDetail(slug){
+  const sub = allSubjects.find(s=>s.slug===slug);
+  if(!sub) return;
+  const st = status(sub);
+  const { checked, total, pct } = subjectPct(sub);
+
+  const backLink = document.getElementById('backLink');
+  if(backLink){
+    backLink.textContent = sub.recorded ? '← Back to recorded' : '← Back to subjects';
+    backLink.dataset.route = sub.recorded ? '#/recorded' : '#/subjects';
+  }
+
+  let calendarHtml = `
+    <div class="weekday-row"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+  `;
+  monthsInRange(sub.start, sub.end).forEach(({year,month})=>{
+    const monthStart = new Date(year, month, 1);
+    const daysCount = new Date(year, month+1, 0).getDate();
+    const offset = (monthStart.getDay() + 6) % 7;
+    const label = monthStart.toLocaleDateString('en-US',{month:'long', year:'numeric'});
+    calendarHtml += `<div class="month-label">${label}</div><div class="days-grid">`;
+    for(let i=0;i<offset;i++) calendarHtml += `<div class="day-cell blank"></div>`;
+    for(let day=1; day<=daysCount; day++){
+      const dateStr = `${year}-${pad(month+1)}-${pad(day)}`;
+      const inRange = dateStr >= sub.start && dateStr <= sub.end;
+      if(!inRange){
+        calendarHtml += `<div class="day-cell muted">${day}</div>`;
+        continue;
+      }
+      const date = parse(dateStr);
+      const isChecked = isDayStudied(slug, dateStr);
+      const isToday = dateStr === todayKey;
+      const isSelected = selectedDate[slug] === dateStr;
+      let cls = 'day-cell';
+      if(isChecked) cls += ' checked';
+      if(isToday) cls += ' today';
+      if(isSelected) cls += ' selected';
+      const style = isChecked ? `style="background:${sub.color};"` : '';
+      calendarHtml += `<div class="${cls}" ${style} data-date="${dateStr}" title="${fmt(date)}">${day}</div>`;
+    }
+    calendarHtml += `</div>`;
+  });
+
+  // --- day review panel ---
+  const selDate = selectedDate[slug];
+  let panelHtml;
+  if(!selDate){
+    panelHtml = `<div class="empty-hint">👉 Tap a date on the calendar to log what you studied that day.</div>`;
+  } else {
+    const topics = topicStore[slug] || [];
+    const dayRec = (dailyLog[slug] && dailyLog[slug][selDate]) || {};
+    const doneCount = topics.filter(t=>dayRec[t]).length;
+
+    const pillsHtml = topics.map(t=>{
+      const isDone = !!dayRec[t];
+      return `<button type="button" class="topic-pill ${isDone?'active':''}" data-topic="${encodeURIComponent(t)}">${t}</button>`;
+    }).join('') || `<div class="no-topics-msg">No syllabus topics yet — add some below to start logging daily content.</div>`;
+
+    const checkedTopics = topics.filter(t=>dayRec[t]);
+    const cardsHtml = checkedTopics.length ? checkedTopics.map(t=>{
+      const encTopic = encodeURIComponent(t);
+      const s = topicSummaries[slug] && topicSummaries[slug][t];
+      const predefined = s
+        ? `<div class="rs-overview">${s.overview}</div><ul class="rs-points">${s.points.map(p=>`<li>${p}</li>`).join('')}</ul>`
+        : ``;
+      const note = (notesStore[slug] && notesStore[slug][t]) || '';
+      const isEditing = editingNote.slug===slug && editingNote.topic===t;
+      let noteBlock;
+      if(isEditing){
+        noteBlock = `
+          <div class="note-block editing" data-topic="${encTopic}">
+            <textarea class="note-input" placeholder="Write your own notes for this topic...">${escapeHtml(note)}</textarea>
+            <div class="note-actions">
+              <button type="button" class="note-save">Save</button>
+              <button type="button" class="note-cancel">Cancel</button>
+            </div>
+          </div>`;
+      } else if(note){
+        noteBlock = `
+          <div class="note-block">
+            <div class="note-label">Your notes</div>
+            <div class="note-text">${escapeHtml(note)}</div>
+            <button type="button" class="note-edit" data-topic="${encTopic}">✎ Edit notes</button>
+          </div>`;
+      } else {
+        noteBlock = `<button type="button" class="note-add" data-topic="${encTopic}">+ Add your own notes</button>`;
+      }
+      return `
+        <div class="review-card">
+          <div class="review-card-head">
+            <span class="rc-title">${t}</span>
+            <button type="button" class="review-card-remove" data-topic="${encTopic}" title="Unmark">✕</button>
+          </div>
+          ${predefined}
+          ${noteBlock}
+        </div>`;
+    }).join('') : `<div class="no-topics-msg">Nothing logged yet for this day — tap a topic above to add it.</div>`;
+
+    panelHtml = `
+      <div class="day-panel-head">
+        <h3>📝 ${fmtLong(parse(selDate))}</h3>
+        <div class="dp-count">${doneCount}/${topics.length} logged</div>
+      </div>
+      <div class="hint">Tap a topic to log it for this day — tap again to remove it. Fully reversible.</div>
+      <div class="topic-pills">${pillsHtml}</div>
+      ${cardsHtml}
+    `;
+  }
+
+  const topicRows = (topicStore[slug]||[]).map((t,i)=>{
+    const log = dailyLog[slug] || {};
+    const daysLogged = Object.values(log).filter(d=>d[t]).length;
+    return `
+      <div class="topic-row">
+        <span class="tname">${t}</span>
+        <span class="tlogged">${daysLogged} day${daysLogged===1?'':'s'} logged</span>
+        <button class="topic-remove" data-idx="${i}" title="Remove">✕</button>
+      </div>`;
+  }).join('') || '<div style="font-size:12.5px;color:var(--ink-dim);">No topics yet — add one below.</div>';
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-head">
+      <h2>${sub.icon} ${sub.name}</h2>
+      <div class="meta">
+        <span>${sub.recorded ? `<b>Self-paced</b> · study anytime` : `<b>${fmt(parse(sub.start))}</b> → <b>${fmt(parse(sub.end))}</b>`}</span>
+        <span class="status-chip ${st}">${STATUS_CHIPS[st]}</span>
+        <span><b>${checked}/${total}</b> days logged (${pct}%)</span>
+      </div>
+      <div class="bar-outer" style="margin-top:16px;"><div class="bar-inner" style="width:${pct}%; background:${sub.color};"></div></div>
+    </div>
+
+    <div class="heatmap-card">
+      <div class="heatmap-flex">
+        <div class="calendar-col">${calendarHtml}</div>
+        <div class="day-panel" id="dayPanel">${panelHtml}</div>
+      </div>
+      <div class="legend-row">
+        <span><span class="sw" style="background:${sub.color}; border-color:${sub.color};"></span>Studied</span>
+        <span><span class="sw"></span>Not yet</span>
+        <span><span class="sw" style="box-shadow:0 0 0 2px var(--brass);"></span>Today</span>
+        <span><span class="sw" style="box-shadow:0 0 0 2px var(--ink);"></span>Selected</span>
+      </div>
+    </div>
+
+    <div class="syllabus-card">
+      <h3>📘 Suggested syllabus</h3>
+      <div class="hint">A generic starting checklist — edit it to match what your batch actually covers. Manage the list here; check off content per-day in the panel above.</div>
+      <div id="topicList">${topicRows}</div>
+      <div class="topic-add">
+        <input type="text" id="newTopicInput" placeholder="Add a topic..." />
+        <button id="addTopicBtn">Add</button>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.day-cell:not(.blank):not(.muted)').forEach(cell=>{
+    cell.addEventListener('click', ()=> selectDate(slug, cell.dataset.date));
+  });
+  document.querySelectorAll('.topic-pill').forEach(btn=>{
+    btn.addEventListener('click', e=> toggleDayTopic(slug, selectedDate[slug], decodeURIComponent(e.currentTarget.dataset.topic)));
+  });
+  document.querySelectorAll('.review-card-remove').forEach(btn=>{
+    btn.addEventListener('click', e=> toggleDayTopic(slug, selectedDate[slug], decodeURIComponent(e.currentTarget.dataset.topic)));
+  });
+  document.querySelectorAll('.note-add, .note-edit').forEach(btn=>{
+    btn.addEventListener('click', e=> startEditNote(slug, decodeURIComponent(e.currentTarget.dataset.topic)));
+  });
+  document.querySelectorAll('.note-block.editing .note-save').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const block = e.currentTarget.closest('.note-block');
+      const topic = decodeURIComponent(block.dataset.topic);
+      const text = block.querySelector('textarea').value;
+      saveNote(slug, topic, text);
+    });
+  });
+  document.querySelectorAll('.note-block.editing .note-cancel').forEach(btn=>{
+    btn.addEventListener('click', ()=> cancelEditNote(slug));
+  });
+  document.querySelectorAll('.topic-remove').forEach(btn=>{
+    btn.addEventListener('click', e=> removeTopic(slug, +e.target.dataset.idx));
+  });
+  const input = document.getElementById('newTopicInput');
+  const addBtn = document.getElementById('addTopicBtn');
+  const submit = ()=>{ addTopic(slug, input.value); input.value=''; };
+  addBtn.addEventListener('click', submit);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+}
+
+/* ---------------- RENDER: TIMELINE ---------------- */
+function renderTimeline(){
+  const months = ["Jul","Aug","Sep","Oct","Nov","Dec"];
+  document.getElementById('tlMonths').innerHTML = '<div></div>' + months.map(m=>`<div>${m} '26</div>`).join('');
+  const rangeStart = new Date("2026-07-01T00:00:00");
+  const rangeEnd = new Date("2027-01-01T00:00:00");
+  const totalRangeDays = daysBetween(rangeStart, rangeEnd);
+  const rowsEl = document.getElementById('tlRows');
+  rowsEl.innerHTML = '';
+  const statusWord = {ongoing:'Ongoing', upcoming:'Upcoming', completed:'Completed'};
+  subjects.forEach(sub=>{
+    const s=parse(sub.start), e=parse(sub.end);
+    const left = Math.max(0, daysBetween(rangeStart,s))/totalRangeDays*100;
+    const width = (daysBetween(s,e)+1)/totalRangeDays*100;
+    const todayLeft = daysBetween(rangeStart, TODAY)/totalRangeDays*100;
+    const st = status(sub);
+    const { checked, total, pct } = subjectPct(sub);
+    const fillWidthWithinBar = width * (pct/100);
+
+    let extra = '';
+    if(st === 'ongoing'){
+      const dayNum = daysBetween(s, TODAY) + 1;
+      extra = `Day ${dayNum} of ${total}`;
+    } else if(st === 'upcoming'){
+      extra = `Starts in ${daysBetween(TODAY, s)} days`;
+    } else {
+      extra = `Wrapped up ${fmt(e)}`;
+    }
+
+    const row = document.createElement('div');
+    row.className = 'tl-row';
+    row.innerHTML = `
+      <div class="name">${sub.icon} ${sub.name}</div>
+      <div class="tl-track-wrap">
+        <div class="tl-track">
+          <div class="tl-bar-outline" style="left:${left}%; width:${width}%; background:${sub.color};"></div>
+          <div class="tl-bar-fill" style="left:${left}%; width:${fillWidthWithinBar}%; background:${sub.color};"></div>
+          ${(todayLeft>=0 && todayLeft<=100) ? `<div class="tl-today" style="left:${todayLeft}%;"></div>` : ''}
+        </div>
+        <div class="tl-meta">
+          <span>${fmt(s)} – ${fmt(e)}</span>
+          <span class="sep">·</span>
+          <span>${checked}/${total} logged (${pct}%)</span>
+          <span class="sep">·</span>
+          <span class="tl-status" style="color:${sub.color};">${statusWord[st]}</span>
+          <span class="sep">·</span>
+          <span>${extra}</span>
+        </div>
+      </div>`;
+    row.addEventListener('click', ()=> location.hash = '#/subjects/'+sub.slug);
+    rowsEl.appendChild(row);
+  });
+}
+
+/* ---------------- RENDER: NEXT UP ---------------- */
+function renderNextUp(){
+  const body = document.getElementById('nextUpBody');
+  const upcoming = subjects.filter(s=>status(s)==='upcoming').sort((a,b)=> parse(a.start)-parse(b.start));
+  const ongoing = subjects.filter(s=>status(s)==='ongoing').sort((a,b)=> parse(a.end)-parse(b.end));
+
+  if(ongoing.length){
+    const sub = ongoing[0];
+    const daysLeft = daysBetween(TODAY, parse(sub.end));
+    const { pct } = subjectPct(sub);
+    body.innerHTML = `
+      <div class="nu-title">${sub.icon} ${sub.name}</div>
+      <div class="nu-sub">Wraps up ${fmt(parse(sub.end))} · ${pct}% of days logged so far</div>
+      <div class="nu-badge">${daysLeft <= 0 ? 'Ends today' : daysLeft + ' day' + (daysLeft===1?'':'s') + ' left'}</div>
+    `;
+  } else if(upcoming.length){
+    const sub = upcoming[0];
+    const daysUntil = daysBetween(TODAY, parse(sub.start));
+    body.innerHTML = `
+      <div class="nu-title">${sub.icon} ${sub.name}</div>
+      <div class="nu-sub">Starts ${fmt(parse(sub.start))}</div>
+      <div class="nu-badge">${daysUntil} day${daysUntil===1?'':'s'} to go</div>
+    `;
+  } else {
+    body.innerHTML = `<div class="nu-sub">All scheduled subjects have wrapped up — nice work.</div>`;
+  }
+}
+
+/* ---------------- RENDER: QUICK PROGRESS ---------------- */
+function renderQuickProgress(){
+  const body = document.getElementById('quickProgressBody');
+  body.innerHTML = subjects.map(sub=>{
+    const { pct } = subjectPct(sub);
+    return `
+      <div class="qp-row" data-slug="${sub.slug}">
+        <span class="qp-name">${sub.icon} ${sub.name}</span>
+        <div class="qp-bar-outer"><div class="qp-bar-inner" style="width:${pct}%; background:${sub.color};"></div></div>
+        <span class="qp-pct">${pct}%</span>
+      </div>`;
+  }).join('');
+  body.querySelectorAll('.qp-row').forEach(row=>{
+    row.addEventListener('click', ()=> location.hash = '#/subjects/'+row.dataset.slug);
+  });
+}
+
+/* ---------------- RENDER: STATS / RING ---------------- */
+function renderStats(){
+  // Union of every date logged across ALL subjects (live + recorded).
+  // Recorded subjects share one window, so summing each subject's own
+  // day-count would count the same calendar day up to 6x over — a union
+  // over the real Jul 27–Dec 31 batch window is the only honest count.
+  const loggedDateSet = new Set();
+  allSubjects.forEach(sub=>{
+    const log = dailyLog[sub.slug] || {};
+    Object.keys(log).forEach(d=>{ if(isDayStudied(sub.slug, d)) loggedDateSet.add(d); });
+  });
+  const windowDays = dateRange(BATCH_WINDOW_START, BATCH_WINDOW_END).length;
+  const checkedDays = loggedDateSet.size;
+  const overallPct = windowDays ? Math.round(checkedDays/windowDays*100) : 0;
+  document.getElementById('ringPct').textContent = overallPct+'%';
+  const c = 264;
+  document.getElementById('ringProgress').setAttribute('stroke-dashoffset', c - (overallPct/100*c));
+  document.getElementById('daysNum').textContent = `${checkedDays}/${windowDays}`;
+
+  const completedCount = allSubjects.filter(s=>subjectPct(s).pct===100).length;
+  document.getElementById('doneNum').textContent = `${completedCount}/${allSubjects.length}`;
+  document.getElementById('ongoingNum').textContent = subjects.filter(s=>status(s)==='ongoing').length;
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('bestStreakNum').textContent = bestStreak;
+
+  // this week: how many of the last 7 days (incl. today) had anything logged
+  let weekCount = 0;
+  for(let i=0;i<7;i++){
+    const d = new Date(TODAY); d.setDate(d.getDate()-i);
+    if(loggedDateSet.has(d.toISOString().slice(0,10))) weekCount++;
+  }
+  document.getElementById('weekNum').textContent = `${weekCount}/7`;
+
+  // topics logged across all subjects
+  let topicsTotal=0, topicsLogged=0;
+  allSubjects.forEach(sub=>{
+    const { logged, total } = topicsLoggedCount(sub.slug);
+    topicsLogged += logged; topicsTotal += total;
+  });
+  document.getElementById('topicsNum').textContent = `${topicsLogged}/${topicsTotal}`;
+
+  renderNextUp();
+  renderQuickProgress();
+}
+
+function renderAll(){
+  renderLiveGrid();
+  renderRecGrid();
+  renderTimeline();
+  renderStats();
+}
+
+/* ---------------- ROUTER ---------------- */
+function router(){
+  const hash = location.hash || '#/overview';
+  const parts = hash.split('/');
+  const base = '#/' + (parts[1] || 'overview');
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+
+  if((parts[1] === 'subjects' || parts[1] === 'recorded') && parts[2]){
+    document.getElementById('page-detail').classList.add('active');
+    const tab = document.querySelector(`.tab[data-route="#/${parts[1]}"]`);
+    if(tab) tab.classList.add('active');
+    renderDetail(parts[2]);
+  } else {
+    const pageId = 'page-' + (parts[1] || 'overview');
+    const page = document.getElementById(pageId);
+    if(page) page.classList.add('active');
+    const tab = document.querySelector(`.tab[data-route="${base}"]`);
+    if(tab) tab.classList.add('active');
+  }
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('[data-route]').forEach(el=>{
+  el.addEventListener('click', ()=> { location.hash = el.dataset.route; });
+});
+window.addEventListener('hashchange', router);
+
+loadAll();
+</script>
+</body>
+</html>
