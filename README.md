@@ -8,6 +8,7 @@ No build step, no dependencies, no account required.
 
 - [Overview](#overview)
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Getting started](#getting-started)
 - [Hosting](#hosting)
 - [Data & storage](#data--storage)
@@ -60,6 +61,59 @@ This started as a simple schedule table and grew into a small tracking app: 13 s
 - Dark mode toggle, remembered between visits.
 - Every action (checking a day, editing a topic, writing a note, switching themes) saves automatically and updates the UI instantly.
 
+## Screenshots
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<img src="assets/overview.png" alt="Overview dashboard" width="100%" />
+<br/>
+<b>Overview dashboard</b>
+<br/>
+Streak (current + best), this week's activity, subjects done, total study days and topics logged, plus a completion ring for the whole batch window. The "Next up" and "Quick progress" panels give a full status check without leaving the page.
+</td>
+<td width="50%" valign="top">
+<img src="assets/timeline.png" alt="Schedule timeline" width="100%" />
+<br/>
+<b>Schedule timeline</b>
+<br/>
+A Gantt-style view of all 7 live subjects. Each bar shows a soft background for its full date range and a solid fill for days actually logged, with a line marking today. Click any row to jump into that subject.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="assets/live-subjects.png" alt="Live subjects grid" width="100%" />
+<br/>
+<b>Live subjects</b>
+<br/>
+All 7 scheduled subjects as cards — status (Ongoing / Upcoming / Completed), a progress bar for days logged, and how many syllabus topics have been covered so far.
+</td>
+<td width="50%" valign="top">
+<img src="assets/subject-detail.png" alt="Subject detail — calendar and day panel" width="100%" />
+<br/>
+<b>Subject detail</b>
+<br/>
+A full month-by-month calendar for the subject. Tap any date to open the day panel on the right — log topics as pills, and each one expands into a short study-note summary with room to add your own notes.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="assets/recorded-subjects.png" alt="Recorded subjects grid" width="100%" />
+<br/>
+<b>Recorded subjects</b>
+<br/>
+Self-paced subjects tracked with the same system as live ones, just sharing a common study window instead of fixed batch dates.
+</td>
+<td width="50%" valign="top">
+<img src="assets/recorded-detail.png" alt="Recorded subject detail" width="100%" />
+<br/>
+<b>Recorded subject detail</b>
+<br/>
+The same calendar + topic-logging system as live subjects — shown here for Verbal Aptitude, with a topic logged for the selected day.
+</td>
+</tr>
+</table>
+
 ## Getting started
 
 Open `index.html` in a browser. There's nothing to install or configure.
@@ -88,6 +142,8 @@ The storage calls are centralized in two functions (`storeGet` / `storeSet`) nea
 ```
 gate-da/
 ├── index.html    — the entire app (markup, styles, and logic in one file)
+├── favicon.svg   — browser tab icon
+├── assets/       — README screenshots
 ├── README.md     — this file
 └── LICENSE       — MIT license
 ```
