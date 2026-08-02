@@ -82,8 +82,11 @@
     background:var(--paper-3); border:1px solid var(--line-hi); border-bottom:none;
     padding:10px 16px; border-radius:10px 10px 0 0; cursor:pointer; margin-bottom:0;
     display:flex; align-items:center; gap:7px; position:relative; top:1px;
+    text-decoration:none;
   }
   .theme-btn:hover{ color:var(--ink); }
+  .top-actions{ display:flex; gap:8px; }
+  .github-btn svg{ flex:none; }
 
   .page{ display:none; }
   .page.active{ display:block; animation: fade .25s ease; }
@@ -288,15 +291,21 @@
       <div class="tab" data-route="#/recorded"><span class="dot"></span>Recorded</div>
       <div class="tab" data-route="#/timeline"><span class="dot"></span>Timeline</div>
     </nav>
-    <button class="theme-btn" id="themeToggle">🌙 <span id="themeLabel">Dark mode</span></button>
+    <div class="top-actions">
+      <a class="theme-btn github-btn" href="https://github.com/Alnajeeb7/GATE_DA" target="_blank" rel="noopener noreferrer" title="View source on GitHub">
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <button class="theme-btn" id="themeToggle">🌙 <span id="themeLabel">Dark mode</span></button>
+    </div>
   </div>
 
   <!-- OVERVIEW -->
   <section class="page" id="page-overview">
     <div class="hero">
-      <div class="eyebrow">GATE 2027 · DA </div>
+      <div class="eyebrow">GATE 2027 · DA</div>
       <h1>GATE 2027 — Data Science &amp; AI</h1>
-      <div class="sub">Your batch schedule, tracked day by day</div>
+      <div class="sub">Your prep schedule, tracked day by day</div>
       <div class="stat-row">
         <div class="stat streak"><div class="num" id="streakNum">0</div><div class="lbl">Day streak</div></div>
         <div class="stat"><div class="num" id="bestStreakNum">0</div><div class="lbl">Best streak</div></div>
@@ -386,20 +395,21 @@ const subjects = [
 ];
 
 // Recorded subjects are self-paced, but get the same daily-log window as the rest of
+// the prep window (its earliest start to its latest end) so they can share the exact same
 // calendar + syllabus + notes system as live subjects.
-const BATCH_WINDOW_START = "2026-07-27";
-const BATCH_WINDOW_END = "2026-12-31";
+const PREP_WINDOW_START = "2026-07-27";
+const PREP_WINDOW_END = "2026-12-31";
 const recorded = [
-  { slug:"verbal", name:"Verbal Aptitude", icon:"🗣️", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#6E4B63", recorded:true },
-  { slug:"calc", name:"Calculus & Optimization", icon:"∫", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#43586B", recorded:true },
-  { slug:"genapt", name:"General Aptitude", icon:"🧠", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#9C7A34", recorded:true },
-  { slug:"linalg", name:"Linear Algebra", icon:"➗", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#2F6259", recorded:true },
-  { slug:"ml", name:"Machine Learning", icon:"🎯", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#3D5940", recorded:true },
-  { slug:"fem", name:"Foundation of Engineering Maths", icon:"📐", start:BATCH_WINDOW_START, end:BATCH_WINDOW_END, color:"#6E4B63", recorded:true },
+  { slug:"verbal", name:"Verbal Aptitude", icon:"🗣️", start:PREP_WINDOW_START, end:PREP_WINDOW_END, color:"#6E4B63", recorded:true },
+  { slug:"calc", name:"Calculus & Optimization", icon:"∫", start:PREP_WINDOW_START, end:PREP_WINDOW_END, color:"#43586B", recorded:true },
+  { slug:"genapt", name:"General Aptitude", icon:"🧠", start:PREP_WINDOW_START, end:PREP_WINDOW_END, color:"#9C7A34", recorded:true },
+  { slug:"linalg", name:"Linear Algebra", icon:"➗", start:PREP_WINDOW_START, end:PREP_WINDOW_END, color:"#2F6259", recorded:true },
+  { slug:"ml", name:"Machine Learning", icon:"🎯", start:PREP_WINDOW_START, end:PREP_WINDOW_END, color:"#3D5940", recorded:true },
+  { slug:"fem", name:"Foundation of Engineering Maths", icon:"📐", start:PREP_WINDOW_START, end:PREP_WINDOW_END, color:"#6E4B63", recorded:true },
 ];
 const allSubjects = [...subjects, ...recorded];
 
-// Generic suggested syllabus per subject — editable starting point, not official batch content
+// Generic suggested syllabus per subject — editable starting point, not official course content
 const defaultTopics = {
   python: ["Python basics & syntax","Data structures (list, dict, tuple, set)","NumPy","Pandas","Data visualization","OOP in Python"],
   ai: ["Intelligent agents","Uninformed search (BFS/DFS)","Informed search (A*, heuristics)","Adversarial search (Minimax)","Constraint satisfaction","Bayesian networks","Neural networks basics"],
@@ -1122,7 +1132,7 @@ function renderDetail(slug){
 
     <div class="syllabus-card">
       <h3>📘 Suggested syllabus</h3>
-      <div class="hint">A generic starting checklist — edit it to match what your batch actually covers. Manage the list here; check off content per-day in the panel above.</div>
+      <div class="hint">A generic starting checklist — edit it to match what your syllabus actually covers. Manage the list here; check off content per-day in the panel above.</div>
       <div id="topicList">${topicRows}</div>
       <div class="topic-add">
         <input type="text" id="newTopicInput" placeholder="Add a topic..." />
@@ -1268,13 +1278,13 @@ function renderStats(){
   // Union of every date logged across ALL subjects (live + recorded).
   // Recorded subjects share one window, so summing each subject's own
   // day-count would count the same calendar day up to 6x over — a union
-  // over the real Jul 27–Dec 31 batch window is the only honest count.
+  // over the real Jul 27–Dec 31 prep window is the only honest count.
   const loggedDateSet = new Set();
   allSubjects.forEach(sub=>{
     const log = dailyLog[sub.slug] || {};
     Object.keys(log).forEach(d=>{ if(isDayStudied(sub.slug, d)) loggedDateSet.add(d); });
   });
-  const windowDays = dateRange(BATCH_WINDOW_START, BATCH_WINDOW_END).length;
+  const windowDays = dateRange(PREP_WINDOW_START, PREP_WINDOW_END).length;
   const checkedDays = loggedDateSet.size;
   const overallPct = windowDays ? Math.round(checkedDays/windowDays*100) : 0;
   document.getElementById('ringPct').textContent = overallPct+'%';
